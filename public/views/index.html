@@ -8,14 +8,21 @@
 
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-		<link href="css/styles.css" rel="stylesheet">
+		<link href="/css/styles.css" rel="stylesheet">
 		<!--[if lt IE 9]>
 		<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
 		<script src="js/libs/json2.js"></script>
 		<![endif]-->
 	</head>
 	<body>
-		<div id="welcome" class="container"></div>
-		<script src="main.min.js"></script>
+		<div id="welcome" class="container">
+      {{#def.react}}
+    </div>
+		<script src="/bundle.js"></script>
+    <script>
+     var React = require('react');
+     var App = require('./react/build/app.js');
+     React.renderComponent( App(), document.getElementById('welcome'));
+    </script>
 	</body>
 </html>
