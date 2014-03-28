@@ -6,8 +6,10 @@ var promise  = require( 'bluebird' );
 var traverse = promise.promisify( require( 'glob' ) );
 var app      = express();
 
-var utils  = require( './utils' );
-var routes = path.resolve( __dirname, 'routes' );
+var utils       = require( './utils' );
+var settings    = require( './settings' );
+var routes      = path.resolve( __dirname, 'routes' );
+var middlewares = path.resolve( __dirname, 'middlewares' );
 
 function Server() {}
 
@@ -23,9 +25,9 @@ Server.prototype.start = function () {
 			console.log( 'App running in ' + env + ' mode @ localhost:9090' );
 		} );
 	} ).catch( function ( error ) {
-		console.log( error );
+		console.error( error );
 	} ).error( function ( error ) {
-		console.log( error );
+		console.error( error );
 	} );
 };
 
@@ -40,11 +42,15 @@ Server.prototype.initRouters = function () {
 	} );
 };
 
+// Initialize middlewares
 Server.prototype.initMiddlewares = function () {
-	app.set( 'views', process.cwd() + '/public/views' );
-	app.use( express.logger( 'dev' ) );
-	app.use( express.static( process.cwd() + '/public' ) );
-	return promise.resolve();
+	return traverse( middlewares + '/*.js', {
+		'sync' : true
+	} ).then( function( setups ) {
+		setups.forEach( function ( setup ) {
+			require( setup )( app );
+		} );
+	} );
 };
 
 Server.prototype.connectMongo = function () {
