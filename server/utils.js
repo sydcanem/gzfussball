@@ -42,7 +42,14 @@ function generateMongoUrl( options ) {
 	return url;
 }
 
+function safeStringify( unsafe ) {
+	return JSON.stringify( unsafe )
+		.replace( /<\/script/g, '<\\/script' )
+		.replace( /<!--/g, '<\\!--' );
+}
+
 // Expose methods and vars
 exports.load = load;
 exports.cache = cache;
 exports.mongoUrl = generateMongoUrl;
+exports.stringify = safeStringify;

@@ -54,7 +54,11 @@ Server.prototype.connectMongo = function () {
 	mongoose.connect( utils.mongoUrl() );
 	db = mongoose.connection;
 
-	db.once( 'open', defer.resolve.bind( defer, 'Mongoose connection open' ) );
+	db.once( 'open', function () {
+		console.log( 'Mongoose connection open.' );
+		defer.resolve();
+	} );
+
 	db.once( 'error', defer.reject.bind( defer, 'Mongoose connection error.' ) );
 
 	return defer.promise;
