@@ -1,11 +1,38 @@
-var React = require('react');
+'use strict';
 
-var App = React.createClass({
-	render: function() {
+var React  = require( 'react' );
+var Table  = require( './table' );
+var Header = require( './header' );
+
+var socket = require( './sockets' );
+var BackboneMixin = require( './backbone.mixin' );
+
+module.exports = React.createClass( {
+
+	mixins : [ BackboneMixin ],
+
+	handleChallenge : function ( opponent ) {
+		socket.emit( 'matches:create', { 'opponent' : opponent } );
+	},
+
+	componentDidMount : function () {
+		socket.on( 'connect', function () {
+			console.log( 'socket.io connected' );
+		} );
+	},
+
+	getBackboneModels : function() {
+		return [ this.props.users  ];
+	},
+
+	render : function () {
 		return (
-			<h1>GulpJS + Browserify + ReactJS</h1>
+			<div className="row">
+				<Header session={this.props.session}/>
+				<div id="table">
+				  <Table users={this.props.users} handleChallenge={this.handleChallenge} />
+				</div>
+			</div>
 		);
 	}
-});
-
-module.exports = App;
+} );

@@ -2,5 +2,7 @@ var express = require( 'express' );
 var settings = require( '../settings' );
 
 module.exports = function( app ) {
-	app.use( express.logger( settings.env ) );
+	if ( settings.env === 'development' ) {
+		app.use( express.logger( 'dev' ) );
+	}
 };

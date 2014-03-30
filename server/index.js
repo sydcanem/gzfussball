@@ -1,10 +1,13 @@
 var http     = require( 'http' );
 var path     = require( 'path' );
-var express  = require( 'express' );
+var express  = require( 'express.io' );
 var mongoose = require( 'mongoose' );
 var promise  = require( 'bluebird' );
 var traverse = promise.promisify( require( 'glob' ) );
 var app      = express();
+var debug    = require( 'debug' )( 'server:index' );
+// Start io server
+app.http().io();
 
 var utils       = require( './utils' );
 var settings    = require( './settings' );
@@ -20,14 +23,14 @@ Server.prototype.start = function () {
 		this.initRouters(),
 		this.connectMongo()
 	] ).then( function () {
-		app.listen( 9090, function () {
+		app.listen( settings.port, function () {
 			var env = app.get( 'env' );
 			console.log( 'App running in ' + env + ' mode @ localhost:9090' );
 		} );
 	} ).catch( function ( error ) {
-		console.error( error );
+		debug( error );
 	} ).error( function ( error ) {
-		console.error( error );
+		debug( error );
 	} );
 };
 

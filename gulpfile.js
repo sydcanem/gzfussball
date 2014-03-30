@@ -31,6 +31,7 @@ gulp.task('scripts', function() {
 gulp.task('bundle', ['react'], function() {
 	var requires = [
 		'-r ./react/build/app.js:app',
+		'-r ./react/build/users.collection.js:users',
 		'-r react'
 	].join(' ');
 	var debug = argv.debug ? '--debug ' : '';

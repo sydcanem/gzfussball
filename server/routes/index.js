@@ -24,14 +24,12 @@ module.exports = function ( app ) {
 							res.send( 500, error );
 						}
 
-						var props = {
-							'users': users
-						};
 						var def = {
-							'users': utils.stringify( props )
+							'users' : utils.stringify( users ),
+							'session' : utils.stringify( req.session.user )
 						};
 
-						pagefn = doT.template( view, undefined, def );
+						var pagefn = doT.template( view, undefined, def );
 						res.send( pagefn() );
 					} );
 			}
