@@ -1,5 +1,7 @@
 'use strict';
 
+var Match = require( '../schemas/match.js' );
+
 module.exports = function( app ) {
 	
 	app.io.route( 'matches', {

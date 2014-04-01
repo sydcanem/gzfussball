@@ -1,18 +1,16 @@
+var utils = require( '../utils' );
 var mongoose = require( 'mongoose' );
 var Schema = mongoose.Schema;
 
 var User = new Schema( {
 	'name' : {
-		'type' : String,
-		'required' : true
+		'type' : String
 	},
 	'login' : {
-		'type' : String,
-		'require' : true
+		'type' : String
 	},
-	'github' : {
-		'type' : Object,
-		'required' : true
+	'avatar' : {
+		'type' : String
 	},
 	'rank' : {
 		'type' : Number,

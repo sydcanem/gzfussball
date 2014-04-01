@@ -7,11 +7,11 @@ var Match = new Schema( {
 		'default' : Date.now
 	},
 	'initiated' : {
-		'type' : mongoose.ObjectId,
+		'type' : Schema.Types.ObjectId,
 		'require' : true
 	},
 	'players' : {
-		'type' : [ mongoose.ObjectId ]
+		'type' : [ Schema.Types.ObjectId ]
 	},
 	'results' : {
 		'type' : Object

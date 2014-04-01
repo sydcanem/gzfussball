@@ -26,7 +26,7 @@ module.exports = function ( app ) {
 
 						var def = {
 							'users' : utils.stringify( users ),
-							'session' : utils.stringify( req.session.user )
+							'session' : utils.stringify( req.session.user || '' )
 						};
 
 						var pagefn = doT.template( view, undefined, def );
