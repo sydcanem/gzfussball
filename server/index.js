@@ -1,29 +1,32 @@
-var http     = require( 'http' );
-var path     = require( 'path' );
-var express  = require( 'express.io' );
-var mongoose = require( 'mongoose' );
-var promise  = require( 'bluebird' );
-var traverse = promise.promisify( require( 'glob' ) );
-var app      = express();
-var debug    = require( 'debug' )( 'server:index' );
+'use strict';
+
+var http       = require( 'http' );
+var path       = require( 'path' );
+var express    = require( 'express.io' );
+var mongoose   = require( 'mongoose' );
+var MongoStore = require( 'connect-mongo' )( express );
+var promise    = require( 'bluebird' );
+var traverse   = promise.promisify( require( 'glob' ) );
+var app        = express();
+var debug      = require( 'debug' )( 'server:index' );
 // Start io server
 app.http().io();
 
 var utils       = require( './utils' );
 var settings    = require( './settings' );
+var middlewares = require( './middlewares' );
 var routes      = path.resolve( __dirname, 'routes' );
-var middlewares = path.resolve( __dirname, 'middlewares' );
 
 function Server() {}
 
 // Server initialization
 Server.prototype.start = function () {
 	promise.all( [
+		this.connectMongo(),
 		this.initMiddlewares(),
-		this.initRouters(),
-		this.connectMongo()
+		this.initRouters()
 	] ).then( function () {
-		app.listen( settings.port, function () {
+		app.listen( settings.app.port, function () {
 			var env = app.get( 'env' );
 			console.log( 'App running in ' + env + ' mode @ localhost:9090' );
 		} );
@@ -47,13 +50,30 @@ Server.prototype.initRouters = function () {
 
 // Initialize middlewares
 Server.prototype.initMiddlewares = function () {
-	return traverse( middlewares + '/*.js', {
-		'sync' : true
-	} ).then( function( setups ) {
-		setups.forEach( function ( setup ) {
-			require( setup )( app );
-		} );
-	} );
+	app.set( 'env', process.env.NODE_ENV );
+	app.set( 'port', settings.app.port );
+	app.set( 'host', settings.app.host );
+
+	
+	app.set( 'views', settings.static.views );
+	app.use( express.static( settings.static.files ) );
+
+	if ( 'development' === app.get( 'env' ) ) {
+		app.use( express.logger() );
+	}
+
+	app.use( express.cookieParser() );
+	app.use( express.session( {
+		'secret' : settings.session.secret,
+		'store' : new MongoStore( {
+			'db' : settings.session.db
+		} )
+	} ) );
+	
+	app.use( middlewares.passport.initialize() );
+	app.use( middlewares.passport.session() );
+	
+	return promise.resolve();
 };
 
 Server.prototype.connectMongo = function () {
