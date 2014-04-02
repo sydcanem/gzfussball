@@ -1,5 +1,5 @@
-var path  = require( 'path' );
-var doT   = require( 'dot' );
+var path	= require( 'path' );
+var doT		= require( 'dot' );
 var utils = require( '../utils' );
 
 var User = require( '../schemas/user' );
@@ -26,7 +26,7 @@ module.exports = function ( app ) {
 
 						var def = {
 							'users' : utils.stringify( users ),
-							'session' : utils.stringify( req.session.user || '' )
+							'session' : utils.stringify( req.session.passport.user || '' )
 						};
 
 						var pagefn = doT.template( view, undefined, def );

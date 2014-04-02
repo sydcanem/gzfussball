@@ -53,8 +53,11 @@ Server.prototype.initMiddlewares = function () {
 	app.set( 'env', process.env.NODE_ENV );
 	app.set( 'port', settings.app.port );
 	app.set( 'host', settings.app.host );
-
 	
+	app.disable( 'x-powered-by' );
+	// Note:
+	// Implement csp using helmet module
+
 	app.set( 'views', settings.static.views );
 	app.use( express.static( settings.static.files ) );
 
@@ -65,10 +68,16 @@ Server.prototype.initMiddlewares = function () {
 	app.use( express.cookieParser() );
 	app.use( express.session( {
 		'secret' : settings.session.secret,
-		'store' : new MongoStore( {
-			'db' : settings.session.db
-		} )
+		'store'  : new MongoStore( {
+			'db'   : settings.session.db
+		} ),
+		'key'    : 'sessionId',
+		'cookie' : {
+			'httpOnly' : true,
+			'secure'   : true
+		}
 	} ) );
+
 	
 	app.use( middlewares.passport.initialize() );
 	app.use( middlewares.passport.session() );
