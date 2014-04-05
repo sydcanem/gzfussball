@@ -9,9 +9,9 @@ module.exports = function ( app ) {
 
 	var routes = [
 		{
-			'method': 'get',
-			'path': '/',
-			'fn': function ( req, res ) {
+			'method' : 'get',
+			'path' : '/',
+			'fn' : function ( req, res ) {
 				var view = utils.load( path.join( views, '/index.html' ) );
 
 				User.find()

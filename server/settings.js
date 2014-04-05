@@ -8,7 +8,7 @@ module.exports = {
 	
 	'session' : {
 		'secret' : 'mouse trap',
-		'db'     : 'session'
+		'db'     : 'dev'
 	},
 
 	'static' : {

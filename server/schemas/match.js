@@ -7,11 +7,11 @@ var Match = new Schema( {
 		'default' : Date.now
 	},
 	'initiated' : {
-		'type' : Schema.Types.ObjectId,
+		'type' : String,
 		'require' : true
 	},
 	'players' : {
-		'type' : [ Schema.Types.ObjectId ]
+		'type' : [ String ]
 	},
 	'results' : {
 		'type' : Object
