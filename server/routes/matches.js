@@ -26,10 +26,10 @@ module.exports = function matches ( app ) {
 						
 						if ( error ) {
 							debug( error );
-							return res.send( 500, 'Something went wrong.' );
+							return response.send( 500, 'Something went wrong.' );
 						}
 
-						res.send( 200, match );
+						response.send( 200, match );
 					} );
 				}
 			]

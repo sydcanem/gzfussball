@@ -1,5 +1,7 @@
-var path	= require( 'path' );
-var doT		= require( 'dot' );
+'use strict';
+
+var path  = require( 'path' );
+var doT   = require( 'dot' );
 var utils = require( '../utils' );
 
 var User = require( '../schemas/user' );
@@ -11,7 +13,7 @@ module.exports = function ( app ) {
 		{
 			'method' : 'get',
 			'path' : '/',
-			'fn' : function ( req, res ) {
+			'fn' : function ( request, response ) {
 				var view = utils.load( path.join( views, '/index.html' ) );
 
 				User.find()
@@ -21,16 +23,16 @@ module.exports = function ( app ) {
 					} )
 					.exec( function ( error, users ) {
 						if ( error ) {
-							res.send( 500, error );
+							return response.send( 500, error );
 						}
 
 						var def = {
 							'users' : utils.stringify( users ),
-							'session' : utils.stringify( req.session.passport.user || '' )
+							'session' : utils.stringify( request.session.passport.user || '' )
 						};
 
 						var pagefn = doT.template( view, undefined, def );
-						res.send( pagefn() );
+						response.send( pagefn() );
 					} );
 			}
 		}

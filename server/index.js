@@ -1,6 +1,5 @@
 'use strict';
 
-var http       = require( 'http' );
 var path       = require( 'path' );
 var express    = require( 'express.io' );
 var mongoose   = require( 'mongoose' );
@@ -73,8 +72,8 @@ Server.prototype.initMiddlewares = function () {
 		} ),
 		'key'    : 'sessionId',
 		'cookie' : {
-			'httpOnly' : true,
-			'secure'   : true
+			'httpOnly' : true
+			// add 'secure' : true when running on ssl
 		}
 	} ) );
 

@@ -25,7 +25,7 @@ module.exports = function ( app ) {
 				passport.authenticate( 'github', { 'failureRedirect' : '/' } ),
 				function( request, response ) {
 					response.redirect( '/' );
-				} 
+				}
 			]
 		},
 		{
@@ -33,8 +33,8 @@ module.exports = function ( app ) {
 			'path' : '/auth/github/signout',
 			'fn' : [
 				passport.ensureAuthenticated,
-				function ( req, res ) {
-					res.redirect( '/' );
+				function ( request, response ) {
+					response.redirect( '/' );
 				}
 			]
 		}

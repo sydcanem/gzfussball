@@ -56,10 +56,11 @@ passport.use( new GithubStrategy( {
 
 passport.ensureAuthenticated = function( request, response, next ) {
 	if ( request.isAuthenticated() ) {
+		request.logout();
 		return next();
 	}
 
-	res.redirect( '/' );
+	response.redirect( '/dont_logout' );
 };
 
 module.exports = passport;
