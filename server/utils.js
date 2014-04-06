@@ -2,6 +2,7 @@
 
 var fs = require( 'fs' );
 var path = require( 'path' );
+var dot = require( 'dot' );
 
 // view cache
 var cache = {};
@@ -48,8 +49,32 @@ function safeStringify( unsafe ) {
 		.replace( /<!--/g, '<\\!--' );
 }
 
+function merge( a, b ) {
+  if ( a && b ) {
+    for ( var key in b ) {
+      a[ key]  = b[ key ];
+    }
+  }
+  return a;
+}
+
+function renderFile( path, options, fn ) {
+	var pagefn;
+	var def = merge( options, { '_load' : load } );
+
+	try {
+		pagefn = dot.template( load( path, options ), undefined, def );
+	} catch ( error ) {
+		fn( error );
+	}
+
+	fn( null, pagefn( options ) );
+}
+
 // Expose methods and vars
 exports.load = load;
 exports.cache = cache;
+exports.merge = merge;
 exports.mongoUrl = generateMongoUrl;
 exports.stringify = safeStringify;
+exports.renderFile = renderFile;

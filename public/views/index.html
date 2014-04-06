@@ -20,7 +20,7 @@
      var React = require( 'react' );
      var App = require( 'app' );
      var Users = require( 'users' );
-     React.renderComponent( App( { 'users' : new Users( {{#def.users}} ), 'session' : {{#def.session}} } ), document.getElementById( 'main' ) );
+     React.renderComponent( App( { 'users' : new Users( {{=it.users}} ), 'session' : {{=it.session}} } ), document.getElementById( 'main' ) );
     </script>
   </body>
 </html>

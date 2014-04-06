@@ -14,9 +14,14 @@ app.http().io();
 var utils       = require( './utils' );
 var settings    = require( './settings' );
 var middlewares = require( './middlewares' );
-var routes      = path.resolve( __dirname, 'routes' );
+var routeFiles  = path.resolve( __dirname, 'routes' );
 
-function Server() {}
+function Server() {
+	if ( !( this instanceof Server ) ) {
+		return new Server();
+	}
+	return this;
+}
 
 // Server initialization
 Server.prototype.start = function () {
@@ -38,13 +43,44 @@ Server.prototype.start = function () {
 
 // Register route handlers
 Server.prototype.initRouters = function () {
-	return traverse( routes + '/*.js', {
-		'sync': true
-	} ).then( function ( routers ) {
-		routers.forEach( function ( router ) {
-			require( router )( app );
-		} );
-	} );
+
+	return traverse( routeFiles + '/*.js' )
+		.then( function ( routers ) {
+			routers.forEach( function ( router ) {
+				var routes = require( router );
+				this.registerRoutes( app, routes );
+			}.bind( this ) );
+		}.bind( this ) );
+};
+
+// Register an array of routes
+Server.prototype.registerRoutes = function ( app, routes ) {
+	routes.forEach( function ( route ) {
+		this.registerRoute( app, route );
+	}.bind( this ) );
+};
+
+// Register a single route
+Server.prototype.registerRoute = function ( app, route ) {
+	// Websocket route
+	if ( route.io ) {
+		app.io.route( route.path, route.events );
+		return;
+	}
+
+	var handlers = [];
+
+	if ( route.authenticate && app.get( 'auth' )  ) {
+		handlers.push( middlewares.passport.ensureAuthenticated );
+	}
+
+	if ( route.fn instanceof Array ) {
+		handlers = handlers.concat( route.fn );
+	} else {
+		handlers.push( route.fn );
+	}
+
+	app[ route.method ]( route.path, handlers );
 };
 
 // Initialize middlewares
@@ -52,18 +88,22 @@ Server.prototype.initMiddlewares = function () {
 	app.set( 'env', process.env.NODE_ENV );
 	app.set( 'port', settings.app.port );
 	app.set( 'host', settings.app.host );
+	// Enable authentication on routes
+	app.set( 'auth', true );
 	
 	app.disable( 'x-powered-by' );
 	// Note:
 	// Implement csp using helmet module
 
 	app.set( 'views', settings.static.views );
-	app.use( express.static( settings.static.files ) );
-
+	app.set( 'view engine', '.html' );
+	app.engine( 'html', utils.renderFile );
+	
 	if ( 'development' === app.get( 'env' ) ) {
 		app.use( express.logger() );
 	}
 
+	app.use( express.bodyParser() );
 	app.use( express.cookieParser() );
 	app.use( express.session( {
 		'secret' : settings.session.secret,
@@ -80,20 +120,24 @@ Server.prototype.initMiddlewares = function () {
 	
 	app.use( middlewares.passport.initialize() );
 	app.use( middlewares.passport.session() );
-	
+	app.use( app.router );
+	app.use( express.static( settings.static.files ) );
+
 	return promise.resolve();
 };
 
-Server.prototype.connectMongo = function () {
+Server.prototype.connectMongo = function ( options ) {
 	var db;
 	var defer = promise.defer();
 
-	mongoose.connect( utils.mongoUrl() );
+	options = options || {};
+
+	mongoose.connect( utils.mongoUrl( options ) );
 	db = mongoose.connection;
 
 	db.once( 'open', function () {
 		console.log( 'Mongoose connection open.' );
-		defer.resolve();
+		defer.resolve( db );
 	} );
 
 	db.once( 'error', defer.reject.bind( defer, 'Mongoose connection error.' ) );
@@ -101,9 +145,4 @@ Server.prototype.connectMongo = function () {
 	return defer.promise;
 };
 
-function start() {
-	new Server().start();
-}
-
-module.exports = app;
-module.exports.start = start;
+module.exports = new Server();

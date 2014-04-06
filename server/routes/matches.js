@@ -1,42 +1,33 @@
 'use strict';
 
 var debug = require( 'debug' )( 'route:matches' );
-var passport = require( '../middlewares' ).passport;
 
 var Match = require( '../schemas/match' );
 var Notification = require( '../schemas/notification' );
 
-module.exports = function matches ( app ) {
+module.exports = [
+	{
+		'method' : 'post',
+		'path' : '/matches/create',
+		'authenticate' : true,
+		'fn' : [
+			function ( request, response ) {
+				Match.create( {
+					'initiated' : request.body.challenger.login,
+					'players' : [
+						request.body.challenger.login,
+						request.body.opponent.login
+					]
+				}, function( error, match ) {
 
-	var routes = [
-		{
-			'method' : 'post',
-			'path' : '/matches/create',
-			'fn' : [
-				passport.ensureAuthenticated,
-				function ( request, response ) {
+					if ( error ) {
+						debug( error );
+						return response.send( 500, 'Something went wrong.' );
+					}
 
-					Match.create( {
-						'initiated' : request.session.passport.user.login,
-						'players' : [
-							request.session.passport.user.login,
-							request.data.opponent.login
-						]
-					}, function( error, match ) {
-						
-						if ( error ) {
-							debug( error );
-							return response.send( 500, 'Something went wrong.' );
-						}
-
-						response.send( 200, match );
-					} );
-				}
-			]
-		}
-	];
-
-	routes.forEach( function ( route ) {
-		app[ route.method ]( route.path, route.fn );
-	} );
-};
+					response.send( 200, match );
+				} );
+			}
+		]
+	}
+];

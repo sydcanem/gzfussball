@@ -56,7 +56,6 @@ passport.use( new GithubStrategy( {
 
 passport.ensureAuthenticated = function( request, response, next ) {
 	if ( request.isAuthenticated() ) {
-		request.logout();
 		return next();
 	}
 
