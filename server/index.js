@@ -32,7 +32,7 @@ Server.prototype.start = function () {
 	] ).then( function () {
 		app.listen( settings.app.port, function () {
 			var env = app.get( 'env' );
-			console.log( 'App running in ' + env + ' mode @ localhost:9090' );
+			debug( 'App running in ' + env + ' mode @ localhost:9090' );
 		} );
 	} ).catch( function ( error ) {
 		debug( error );
@@ -136,7 +136,7 @@ Server.prototype.connectMongo = function ( options ) {
 	db = mongoose.connection;
 
 	db.once( 'open', function () {
-		console.log( 'Mongoose connection open.' );
+		debug( 'Mongoose connection open.' );
 		defer.resolve( db );
 	} );
 
