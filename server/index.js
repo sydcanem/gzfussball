@@ -5,6 +5,7 @@ var express    = require( 'express.io' );
 var mongoose   = require( 'mongoose' );
 var MongoStore = require( 'connect-mongo' )( express );
 var promise    = require( 'bluebird' );
+var edotjs     = require( 'edotjs' );
 var traverse   = promise.promisify( require( 'glob' ) );
 var app        = express();
 var debug      = require( 'debug' )( 'server:index' );
@@ -96,8 +97,8 @@ Server.prototype.initMiddlewares = function () {
 	// Implement csp using helmet module
 
 	app.set( 'views', settings.static.views );
-	app.set( 'view engine', '.html' );
-	app.engine( 'html', utils.renderFile );
+	app.set( 'view engine', 'html' );
+	app.engine( 'html', edotjs.renderFile );
 	
 	if ( 'development' === app.get( 'env' ) ) {
 		app.use( express.logger() );

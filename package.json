@@ -45,6 +45,7 @@
     "underscore": "^1.6.0",
     "jquery": "^2.1.0",
     "passport": "^0.2.0",
-    "passport-github": "^0.1.5"
+    "passport-github": "^0.1.5",
+    "edotjs": "^0.1.0"
   }
 }
